@@ -1,0 +1,1 @@
+"""Prompt schema placeholder."""
