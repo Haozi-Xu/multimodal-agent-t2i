@@ -1,0 +1,8 @@
+generator:
+  backend: sdxl
+  output_dir: outputs/generations
+  log_file: outputs/logs/generation.jsonl
+  width: 512
+  height: 512
+  steps: 30
+  guidance_scale: 7.5
