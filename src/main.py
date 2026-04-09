@@ -15,6 +15,16 @@ DEFAULT_CONFIG = {
         "height": 512,
         "steps": 30,
         "guidance_scale": 7.5,
+        "backends": {
+            "sdxl": {
+                "model_id": "stabilityai/stable-diffusion-xl-base-1.0",
+                "device": None,
+                "torch_dtype": "float16",
+                "local_files_only": False,
+                "variant": "fp16",
+                "use_safetensors": True,
+            }
+        },
     }
 }
 
@@ -61,6 +71,7 @@ def main() -> None:
         backend=backend,
         output_dir=conf["output_dir"],
         log_file=conf["log_file"],
+        backend_kwargs=conf.get("backends", {}),
     )
     result = service.run(request)
     print(
