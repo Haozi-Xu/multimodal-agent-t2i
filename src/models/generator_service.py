@@ -18,12 +18,14 @@ class GeneratorService:
         backend: str = "sdxl",
         output_dir: str = "outputs/generations",
         log_file: str = "outputs/logs/generation.jsonl",
+        backend_kwargs: dict | None = None,
     ) -> None:
         self.output_dir = Path(output_dir)
         self.log_file = log_file
+        backend_kwargs = backend_kwargs or {}
 
         self.backends: dict[str, T2IBackend] = {
-            "sdxl": SDXLBackend(),
+            "sdxl": SDXLBackend(**backend_kwargs.get("sdxl", {})),
             "flux": FluxBackend(),
         }
         if backend not in self.backends:

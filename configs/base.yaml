@@ -6,3 +6,11 @@ generator:
   height: 512
   steps: 30
   guidance_scale: 7.5
+  backends:
+    sdxl:
+      model_id: stabilityai/stable-diffusion-xl-base-1.0
+      device: null
+      torch_dtype: float16
+      local_files_only: false
+      variant: fp16
+      use_safetensors: true
