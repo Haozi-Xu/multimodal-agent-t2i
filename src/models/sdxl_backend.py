@@ -83,30 +83,34 @@ class SDXLBackend(T2IBackend):
         if importlib.util.find_spec("torch") is None or importlib.util.find_spec("diffusers") is None:
             self._init_error = RuntimeError("Missing torch/diffusers dependencies.")
             return
-        torch = importlib.import_module("torch")
-        diffusers = importlib.import_module("diffusers")
-        StableDiffusionXLPipeline = getattr(diffusers, "StableDiffusionXLPipeline")
+        try:
+            torch = importlib.import_module("torch")
+            diffusers = importlib.import_module("diffusers")
+            StableDiffusionXLPipeline = getattr(diffusers, "StableDiffusionXLPipeline")
 
-        if self.device is None:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            if self.device is None:
+                self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        dtype_map = {
-            "float16": torch.float16,
-            "float32": torch.float32,
-            "bfloat16": torch.bfloat16,
-        }
-        selected_dtype = dtype_map.get(self.torch_dtype, torch.float16)
-        if self.device == "cpu":
-            selected_dtype = torch.float32
+            dtype_map = {
+                "float16": torch.float16,
+                "float32": torch.float32,
+                "bfloat16": torch.bfloat16,
+            }
+            selected_dtype = dtype_map.get(self.torch_dtype, torch.float16)
+            if self.device == "cpu":
+                selected_dtype = torch.float32
 
-        self._pipe = StableDiffusionXLPipeline.from_pretrained(
-            self.model_id,
-            torch_dtype=selected_dtype,
-            local_files_only=self.local_files_only,
-            variant=self.variant,
-            use_safetensors=self.use_safetensors,
-        )
-        self._pipe = self._pipe.to(self.device)
+            self._pipe = StableDiffusionXLPipeline.from_pretrained(
+                self.model_id,
+                torch_dtype=selected_dtype,
+                local_files_only=self.local_files_only,
+                variant=self.variant,
+                use_safetensors=self.use_safetensors,
+            )
+            self._pipe = self._pipe.to(self.device)
+        except Exception as exc:
+            self._pipe = None
+            self._init_error = exc
 
     def _generate_with_pipeline(self, request: GenerationRequest) -> list[Any]:
         import torch

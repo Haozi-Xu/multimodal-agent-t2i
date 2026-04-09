@@ -24,13 +24,13 @@ class GeneratorService:
         self.log_file = log_file
         backend_kwargs = backend_kwargs or {}
 
-        self.backends: dict[str, T2IBackend] = {
-            "sdxl": SDXLBackend(**backend_kwargs.get("sdxl", {})),
-            "flux": FluxBackend(),
-        }
-        if backend not in self.backends:
+        if backend == "sdxl":
+            selected_backend: T2IBackend = SDXLBackend(**backend_kwargs.get("sdxl", {}))
+        elif backend == "flux":
+            selected_backend = FluxBackend()
+        else:
             raise ValueError(f"Unsupported backend: {backend}")
-        self.backend = self.backends[backend]
+        self.backend = selected_backend
 
     def run(self, request: GenerationRequest) -> GenerationResult:
         request_id = uuid.uuid4().hex[:12]
